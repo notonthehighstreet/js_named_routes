@@ -1,9 +1,5 @@
 <% if use_scope? %>
 var <%= scope %> = {
-
-host: <%= "#{request.protocol}#{request.host_with_port}".inspect %>,
-<% else -%>
-var js_named_routes_server_host = <%= "#{request.protocol}#{request.host_with_port}".inspect %>;
 <% end -%>
 
 <%= function_header("get_path", "segments, options, overrides") %>
@@ -52,19 +48,19 @@ var js_named_routes_server_host = <%= "#{request.protocol}#{request.host_with_po
 }<%= end_function %>
 
 <% ActionController::Routing::Routes.named_routes.each do |name, route| -%>
-// name: <%= name %>
-// routes: <%= route %>
 
 <%= function_header("#{name}_url", "overrides") %> return <%= scoped %><%= host %> + <%= scoped %><%= name %>_path(overrides) }<%= end_function %>
 
 <%= function_header("#{name}_path", "overrides") %>
-	<%- keys = route.significant_keys -%>
-	var options = {<% keys.each_with_index do |key, ndx| %><%= key %>:<%= route.defaults[key].nil? ? "''" : "'#{route.defaults[key]}'" %><%= ndx == keys.size - 1 ? "" : "," %><% end %>};
+	var options = {<%= route.significant_keys.collect{|key| "#{key}: '#{route.defaults[key]}'"}.join(', ') -%>};
 	return <%= scoped %>get_path("<%= route.segments.collect(&:to_s) %>", options, overrides);
 }<%= end_function %>
 
 <% end -%>
 
 <% if use_scope? %>
+host: <%= "#{request.protocol}#{request.host_with_port}".inspect %>
 };
-<% end %>
+<% else -%>
+var js_named_routes_server_host = <%= "#{request.protocol}#{request.host_with_port}".inspect %>;
+<% end -%>
