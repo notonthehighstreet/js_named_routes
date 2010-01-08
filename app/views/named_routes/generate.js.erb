@@ -15,15 +15,13 @@ var <%= scope %> = {
     }
   }
 
-  if (options["format"] == "") {
-    segments = segments.replace("(.:format)?", "");
-  }
-  else {
-    segments = segments.replace("(.:format)?", "."+options["format"]);
-  }
-  delete options["format"];
-
   for (var prop in options) {
+    // perform replace for optional props (e.g. 'format=json'):
+    //  "/avatar/new(.:format)?" ==> "/avatar/new.json"
+    segments = segments.replace(new RegExp("\\(([^:]*):" + prop + '\\)\\?'),(options[prop] ? '$1' : '') + options[prop])
+
+    // perform standard replace for required props (e.g. 'id=1'):
+    //  "/avatar/:id/edit" ==> "/avatar/1/edit"
     segments = segments.replace(":"+prop, options[prop]);
   }
 
