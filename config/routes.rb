@@ -1,3 +1,3 @@
 ActionController::Routing::Routes.draw do |map|
-  map.named_routes '/javascripts/named_routes.:format', :controller => 'named_routes', :action => 'generate'
+  map.named_routes '/js_named_routes.:format', :controller => 'named_routes', :action => 'generate'
 end
