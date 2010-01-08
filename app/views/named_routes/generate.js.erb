@@ -3,48 +3,48 @@ var <%= scope %> = {
 <% end -%>
 
 <%= function_header("get_path", "segments, options, overrides") %>
-	var extras = null;
+  var extras = null;
 
-	for (var property in overrides) {
-		if (options[property] != null) {
-			options[property] = overrides[property];
-		}
-		else {
-			extras = extras ? extras : {};
-			extras[property] = overrides[property]
-		}
-	}
-	
-	if (options["format"] == "") {
-		segments = segments.replace("(.:format)?", "");
-	}
-	else {
-		segments = segments.replace("(.:format)?", "."+options["format"]);
-	}
-	delete options["format"];
+  for (var property in overrides) {
+    if (options[property] != null) {
+      options[property] = overrides[property];
+    }
+    else {
+      extras = extras ? extras : {};
+      extras[property] = overrides[property]
+    }
+  }
 
-	for (var prop in options) {
-		segments = segments.replace(":"+prop, options[prop]);
-	}
+  if (options["format"] == "") {
+    segments = segments.replace("(.:format)?", "");
+  }
+  else {
+    segments = segments.replace("(.:format)?", "."+options["format"]);
+  }
+  delete options["format"];
 
-	var query="";
-	if (extras) {
-		query += "?"
-		for (var extra in extras) {
-			query += extra + "=" + extras[extra] + "&";
-		}
-		query = query.substring(0, query.length-1);
-	}
+  for (var prop in options) {
+    segments = segments.replace(":"+prop, options[prop]);
+  }
 
-	var path = segments;
-	while (path[path.length - 1] == "/") {
-		path = path.substring(0, path.length - 1);
-	}
-	return path + query;
+  var query="";
+  if (extras) {
+    query += "?"
+    for (var extra in extras) {
+      query += extra + "=" + extras[extra] + "&";
+    }
+    query = query.substring(0, query.length-1);
+  }
+
+  var path = segments;
+  while (path[path.length - 1] == "/") {
+    path = path.substring(0, path.length - 1);
+  }
+  return path + query;
 }<%= end_function %>
 
 <%= function_header("get_url", "segments, options, overrides") %>
-	return <%= scoped %><%= host %> + <%= scoped %>get_path(segments, options, overrides);
+  return <%= scoped %><%= host %> + <%= scoped %>get_path(segments, options, overrides);
 }<%= end_function %>
 
 <% ActionController::Routing::Routes.named_routes.each do |name, route| -%>
@@ -52,8 +52,8 @@ var <%= scope %> = {
 <%= function_header("#{name}_url", "overrides") %> return <%= scoped %><%= host %> + <%= scoped %><%= name %>_path(overrides) }<%= end_function %>
 
 <%= function_header("#{name}_path", "overrides") %>
-	var options = {<%= route.significant_keys.collect{|key| "#{key}: '#{route.defaults[key]}'"}.join(', ') -%>};
-	return <%= scoped %>get_path("<%= route.segments.collect(&:to_s) %>", options, overrides);
+  var options = {<%= route.significant_keys.collect{|key| "#{key}: '#{route.defaults[key]}'"}.join(', ') -%>};
+  return <%= scoped %>get_path("<%= route.segments.collect(&:to_s) %>", options, overrides);
 }<%= end_function %>
 
 <% end -%>
