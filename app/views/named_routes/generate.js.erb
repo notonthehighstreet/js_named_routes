@@ -51,7 +51,7 @@ var <%= scope %> = {
 
 <%= function_header("#{name}_path", "overrides") %>
   var options = {<%= route.significant_keys.collect{|key| "#{key}: '#{route.defaults[key]}'"}.join(', ') -%>};
-  return <%= scoped %>get_path("<%= route.segments.collect(&:to_s) %>", options, overrides);
+  return <%= scoped %>get_path("<%= route.segments.collect(&:to_s).join %>", options, overrides);
 }<%= end_function %>
 
 <% end -%>
