@@ -1,3 +1,3 @@
-ActionController::Routing::Routes.draw do |map|
-  map.named_routes '/js_named_routes.:format', :controller => 'named_routes', :action => 'generate'
+Rails.application.routes.draw do |map|
+  match '/js_named_routes' => 'named_routes#generate', :method => :get
 end

@@ -50,15 +50,15 @@ var <%= scope %> = {
 <%= function_header("#{name}_url", "overrides") %> return <%= scoped %><%= host %> + <%= scoped %><%= name %>_path(overrides) }<%= end_function %>
 
 <%= function_header("#{name}_path", "overrides") %>
-  var options = {<%= route.significant_keys.collect{|key| "#{key}: '#{route.defaults[key]}'"}.join(', ') -%>};
-  return <%= scoped %>get_path("<%= route.segments.collect(&:to_s).join %>", options, overrides);
+  var options = {<%= route.segment_keys.collect{|key| "#{key}: '#{route.defaults[key]}'"}.join(', ').html_safe -%>};
+  return <%= scoped %>get_path("<%= route.path %>?", options, overrides);
 }<%= end_function %>
 
 <% end -%>
 
 <% if use_scope? %>
-host: <%= "#{request.protocol}#{request.host_with_port}".inspect %>
+host: <%= "#{request.protocol}#{request.host_with_port}".inspect.html_safe %>
 };
 <% else -%>
-var js_named_routes_server_host = <%= "#{request.protocol}#{request.host_with_port}".inspect %>;
+var js_named_routes_server_host = <%= "#{request.protocol}#{request.host_with_port}".inspect.html_safe %>;
 <% end -%>
