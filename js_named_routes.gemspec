@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.email       = ["galen.ohanlon@plastictrophy.com", "matt@futureadapter.com"]
   s.homepage    = "http://github.com/jellybob/js_named_routes"
   s.summary     = %q{Rails named routes in javascript}
-  s.description = File.read(README.markdown)
+  s.description = File.read("README.markdown")
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
