@@ -45,7 +45,7 @@ var <%= scope %> = {
   return <%= scoped %><%= host %> + <%= scoped %>get_path(segments, options, overrides);
 }<%= end_function %>
 
-<% ActionController::Routing::Routes.named_routes.each do |name, route| -%>
+<% Rails.application.routes.named_routes.each do |name, route| -%>
 
 <%= function_header("#{name}_url", "overrides") %> return <%= scoped %><%= host %> + <%= scoped %><%= name %>_path(overrides) }<%= end_function %>
 
