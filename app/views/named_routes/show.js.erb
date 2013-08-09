@@ -1,0 +1,73 @@
+var <%= scope %> = {
+  get_path: function(path, parameters, options) {
+    var parameters   = parameters || {};
+    var options      = options || {};
+    var query_string = "";
+
+    // FIXME: find a better way to override options and set parameters
+    // Split `overrides` into:
+    // - options which are used to generate the path
+    // - parameters which are inserted into the query string
+    for (var key in parameters) {
+      if (options[key] != null) {
+        options[key] = parameters[key];
+        delete parameters[key];
+      }
+    }
+
+    for (var key in options) {
+      // perform replace for optional props (e.g. 'format=json'):
+      //  "/avatar/new(.:format)?" ==> "/avatar/new.json"
+      path = path.replace(new RegExp("\\(([^:]*):" + key + '\\)\\?'),(options[key] ? '$1' : '') + options[key]);
+
+      // perform standard replace for required props (e.g. 'id=1'):
+      //  "/avatar/:id/edit" ==> "/avatar/1/edit"
+      path = path.replace(":"+key, options[key]);
+    }
+
+    // Generate query string if parameters are present
+    if (Object.keys(parameters).length > 0) {
+      query_string += "?";
+      for (var key in parameters) {
+        query_string += key + "=" + parameters[key] + "&";
+      }
+      query_string = query_string.substring(0, query_string.length - 1);
+    }
+    
+    // Remove trailing `/` from path
+    while (path[path.length - 1] == "/") {
+      path = path.substring(0, path.length - 1);
+    }
+
+    return path + query_string;
+  },
+
+  get_url: function(path, parameters, options) {
+    var parameters   = parameters || {};
+    var options      = options || {};
+    
+    for (var key in parameters) {
+      if (options[key] != null) {
+        options[key] = parameters[key];
+        delete parameters[key];
+      }
+    }
+
+    return options["host"] + <%= scope %>.get_path(path, parameters, options);
+  },
+
+<%- Rails.application.routes.named_routes.each do |name, route| -%>
+  <%= name %>_url: function(parameters) {
+    var options = {host:<%= scope %>.host,<%= route.segment_keys.collect{|key| "#{key}: '#{route.defaults[key]}'"}.join(',').html_safe -%>};
+    return <%= scope %>.get_url("<%= route.path.spec %>?", parameters, options);
+  },
+
+  <%= name %>_path: function(parameters) {
+    var options = {<%= route.segment_keys.collect{|key| "#{key}: '#{route.defaults[key]}'"}.join(',').html_safe -%>};
+    return <%= scope %>.get_path("<%= route.path.spec %>?", parameters, options);
+  },
+
+<%- end -%>
+
+  host: <%= "#{request.protocol}#{request.host_with_port}".inspect.html_safe %>
+};

@@ -4,7 +4,7 @@ module JsNamedRoutes
 
   class Config
     def self.scope
-      @@scope ||= ""
+      @@scope ||= nil
     end
   
     def self.scope=(scope)
