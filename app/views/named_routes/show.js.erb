@@ -56,6 +56,23 @@ var <%= scope %> = {
     return options["host"] + <%= scope %>.get_path(path, parameters, options);
   },
 
+  change_subdomain_of_host: function(subdomain, host) {
+    var matches    = host.match(/^(([^:]+:)?\/\/)?(.*)/) // splits protocol from host
+    var protocol   = matches[1] || "";
+    var fqdn       = matches[3];
+    var fqdn_parts = fqdn.split(".");
+
+    // Adds subdomain if no domain present in host (e.g. example.com)
+    // or substitute first subdomain with new one
+    if (fqdn_parts.length < 3) {
+      fqdn_parts.unshift(subdomain)
+    } else {
+      fqdn_parts[0] = subdomain
+    }
+
+    return protocol + fqdn_parts.join(".");
+  },
+
 <%- Rails.application.routes.named_routes.each do |name, route| -%>
   <%= name %>_url: function(parameters) {
     var options = {host:<%= scope %>.host,<%= route.segment_keys.collect{|key| "#{key}: '#{route.defaults[key]}'"}.join(',').html_safe -%>};
