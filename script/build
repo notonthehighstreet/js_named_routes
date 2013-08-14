@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+
+export PATH=$PATH:node_modules/.bin
+export CI_REPORTS="results"
+errors=0
+
+function say {
+  echo "*** $*"
+}
+
+function run_cmd {
+  echo "Running $@" >&2
+  "$@"
+  local error=$?
+  if [ $error -ge 1 ]; then
+    echo "script/build-parallel: [ERROR] command exited with status code $error: $@"
+    errors=1
+
+    return 1
+  else
+    return 0
+  fi
+}
+
+function has_errors {
+  test $errors = 1
+  return $?
+}
+
+function no_errors {
+  test $errors = 0
+  return $?
+}
+
+say "Setting up environment"
+
+if test -d /tmp/jenkins/shared/bundle; then
+  bundle install --path="/tmp/jenkins/shared/bundle"
+else
+  bundle install
+fi
+
+rm -Rf results && mkdir -p results
+rm -Rf spec/dummy/db/*.sqlite3 && (cd spec/dummy/db && bundle exec rake db:setup)
+
+say "Running tests"
+
+run_cmd bundle exec rspec --options spec/ci.opts
+
+(cd spec/dummy && mkdir -p public/javascripts && bundle exec rake js_named_routes:cache)
+run_cmd mocha --reporter xunit > results/mocha.xml
+
+if has_errors; then
+  say "Build failed"
+  exit 1
+else
+  say "Build succeeded"
+fi

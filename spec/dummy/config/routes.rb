@@ -1,4 +1,7 @@
 Dummy::Application.routes.draw do
+  mount JsNamedRoutes::Engine => "/"
+  resources :products
+
   # get "/javascripts/named_routes" => "named_routes#generate", :format => :js
   # The priority is based upon order of creation:
   # first created -> highest priority.
