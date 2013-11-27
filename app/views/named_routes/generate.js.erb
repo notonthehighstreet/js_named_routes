@@ -27,7 +27,7 @@ var <%= scope %> = {
 
   var query="";
   if (extras) {
-    query += "?"
+    query += segments[segments.length - 1] === "?" ?  "" :  "?";
     for (var extra in extras) {
       query += extra + "=" + extras[extra] + "&";
     }
